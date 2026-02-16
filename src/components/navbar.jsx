@@ -1,3 +1,6 @@
+import './styles/navbar.css'; 
+import logo from "../assets/logo.png";
+
 function Navbar() {
     return (
         <header>
@@ -7,7 +10,8 @@ function Navbar() {
                     {/* Logo */}
                     <a className="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="#">
                         <img
-                            src="https://cdn-icons-png.flaticon.com/512/727/727245.png"
+                            className='logoNav'
+                            src={logo}
                             alt="Noisync Logo"
                             width="28"
                             height="28"
@@ -24,16 +28,15 @@ function Navbar() {
                     >
                         <span className="navbar-toggler-icon"></span>
                     </button>
-
                     {/* Botones derecha */}
                     <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
                         <div className="d-flex gap-2">
 
-                            <button className="btn btn-outline-secondary btn-sm px-3">
+                            <button className="btn btn-outline-secondary btn-sm px-3" id='btnSesion'>
                                 Iniciar sesión
                             </button>
 
-                            <button className="btn btn-dark btn-sm px-3">
+                            <button className="btn btn-dark btn-sm px-3" id='btnRegistro'>
                                 Registrar banda
                             </button>
 

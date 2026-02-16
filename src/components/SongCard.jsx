@@ -1,4 +1,6 @@
-function SongCard({ titulo, artista, genero, estado }) {
+import './styles/songcard.css'; 
+
+function SongCard({ cover, titulo, artista, estado }) {
     return (
         <div className="col-md-3 mb-4">
             <div className="card shadow-sm h-100">
@@ -8,7 +10,7 @@ function SongCard({ titulo, artista, genero, estado }) {
                     className="d-flex align-items-center justify-content-center bg-light"
                     style={{ height: "180px" }}
                 >
-                    <span className="text-muted fs-4">Cover</span>
+                    <span className="text-muted fs-4" id='coverCard'>cover</span>
                 </div>
 
                 <div className="card-body">
@@ -16,8 +18,7 @@ function SongCard({ titulo, artista, genero, estado }) {
                     <small className="text-muted d-block">{artista}</small>
 
                     <div className="d-flex justify-content-between align-items-center mt-2">
-                        <span className="badge bg-success">{estado}</span>
-                        <small className="text-muted">{genero}</small>
+                        <span className="badge">{estado}</span>
                     </div>
 
                     <button className="btn btn-outline-secondary btn-sm w-100 mt-3">

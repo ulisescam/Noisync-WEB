@@ -1,3 +1,5 @@
+import './styles/pagination.css'; 
+
 function Pagination() {
     return (
         <nav className="mt-4">

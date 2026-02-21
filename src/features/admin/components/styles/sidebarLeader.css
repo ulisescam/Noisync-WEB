@@ -1,0 +1,25 @@
+.nav-link {
+    color: #6c757d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-weight: 500;
+    border-color: #6c757d;
+}
+
+.nav-link:hover {
+    background-color: #f1f3f5;
+    color: black;
+}
+
+.nav-link.active {
+    background-color: #f1f3f5 !important;
+    color: black !important;
+}
+button.btn-light {
+    border: none;
+}
+
+button.btn-light:hover {
+    background-color: #f8f9fa;
+}
+

@@ -1,5 +1,5 @@
-import "./styles/frominput.css";
 import { useState } from "react";
+import "./styles/frominput.css";
 
 function FormInput({
     label,

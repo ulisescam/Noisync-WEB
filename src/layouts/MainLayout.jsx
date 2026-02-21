@@ -1,17 +1,19 @@
-import Navbar from "../components/navbar";
-import Footer from "../components/Footer";
 import { Outlet } from "react-router-dom";
+import Footer from "../features/shared/components/Footer";
 
 function MainLayout() {
     return (
-        <>
+        <div className="d-flex flex-column min-vh-100">
 
-            <main style={{ minHeight: "80vh" }}>
+            {/* Contenido dinámico */}
+            <div className="flex-grow-1">
                 <Outlet />
-            </main>
+            </div>
 
+            {/* Footer */}
             <Footer />
-        </>
+
+        </div>
     );
 }
 

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/navbar";
+import Navbar from "../../shared/components/navbar";
 import SongCard from "../components/SongCard";
-import SearchBar from "../components/SearchBar";
-import Filters from "../components/Filters";
-import Pagination from "../components/Pagination";
+import SearchBar from "../../shared/components/SearchBar";
+import Pagination from "../../shared/components/Pagination";
+
+
 function searchPublicSongs() {
 
     const [canciones, setCanciones] = useState([]);

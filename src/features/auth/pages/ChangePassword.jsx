@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../components/styles/changePassword.css";
+import { useNavigate, Link } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
+import "../components/styles/changePassword.css";
 
 
 function ChangePassword() {

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import "../components/styles/login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
-import { Link } from "react-router-dom";
+import "../components/styles/login.css";
+
 
 
 function Login() {

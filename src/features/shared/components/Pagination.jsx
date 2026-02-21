@@ -1,4 +1,4 @@
-import './styles/pagination.css';
+import "../styles/pagination.css";
 
 function Pagination({ totalPaginas, paginaActual, setPaginaActual }) {
     return (

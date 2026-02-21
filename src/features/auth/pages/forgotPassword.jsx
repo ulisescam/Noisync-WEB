@@ -1,9 +1,9 @@
-import AuthHeader from "../components/AuthHeader";
-import FormInput from "../components/FormInput";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthHeader from "../components/AuthHeader";
+import FormInput from "../components/FormInput";
 import "../components/styles/changePassword.css";
-import { Link } from "react-router-dom";
+
 function ForgotPassword() {
     const navigate = useNavigate();
     const [correoElectronico, setCorreoElectronico] = useState("");

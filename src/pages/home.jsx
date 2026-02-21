@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/navbar";
-import SongCard from "../components/SongCard";
-import SearchBar from "../components/SearchBar";
-import Filters from "../components/Filters";
-import Pagination from "../components/Pagination";
+
+import Navbar from "../features/shared/components/navbar";
+import SearchBar from "../features/shared/components/SearchBar";
+import Filters from "../features/shared/components/Filters";
+import Pagination from "../features/shared/components/Pagination";
+
+import SongCard from "../features/songs/components/SongCard";
 
 function Home() {
 
     const [canciones, setCanciones] = useState([]);
 
     useEffect(() => {
-
 
         const cancionesMock = [
             { id: 1, titulo: "Noche estrellada", artista: "Luna Gris", estado: "Pública" },

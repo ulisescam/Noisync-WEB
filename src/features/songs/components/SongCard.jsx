@@ -1,4 +1,4 @@
-import './styles/songcard.css';
+import "../styles/songcard.css";
 import SongAvatar from "./songAvatar";
 import { useNavigate } from "react-router-dom";
 

@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./styles/authHeader.css";
-import { Link } from "react-router-dom";
 
 function AuthHeader({ title = "Noisync", showBack = true }) {
 

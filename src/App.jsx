@@ -1,12 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import MainLayout from "./layouts/MainLayout";
+
+import HomeLeader from "./features/admin/pages/homeLeader";
+
+import Login from "./features/auth/pages/login";
+import ChangePassword from "./features/auth/pages/ChangePassword";
+import Registro from "./features/auth/pages/registro";
+import ForgotPassword from "./features/auth/pages/forgotPassword";
+
+import SongSeachPublic from "./features/songs/pages/searchPublicSongs";
+import VistaPublicaCancion from "./features/songs/pages/vistaPublicaCancion";
+
 import Home from "./pages/home";
-import Login from "./pages/login";
-import ChangePassword from "./pages/ChangePassword";
-import Registro from "./pages/registro";
-import ForgotPassword from "./pages/forgotPassword";
-import SongSeachPublic from "./pages/searchPublicSongs";
-import VistaPublicaCancion from "./pages/vistaPublicaCancion";
+
 
 
 

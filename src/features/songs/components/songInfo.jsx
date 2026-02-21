@@ -1,4 +1,4 @@
-import "./styles/songInfo.css";
+import "../styles/songInfo.css";
 import SongAvatar from "./songAvatar";
 
 function SongInfo({ titulo, artista, tono, bpm, estado, cover }) {

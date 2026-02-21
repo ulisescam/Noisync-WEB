@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import AuthHeader from "../components/AuthHeader";
 import SongInfo from "../components/songInfo";
+import Navbar from "../../shared/components/navbar";
 
 function VistaPublicaCancion() {
 

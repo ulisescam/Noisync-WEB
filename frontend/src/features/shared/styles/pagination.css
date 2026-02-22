@@ -1,0 +1,35 @@
+/* Quitar borde redondeado default raro */
+.pagination .page-link {
+  border-radius: 8px;
+  border: 1px solid #000;
+  color: #000;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.pagination .page-link:hover {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* Página activa */
+.pagination .page-item.active .page-link {
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+/* Disabled */
+.pagination .page-item.disabled .page-link {
+  color: #999;
+  border-color: #ddd;
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+/* Separación entre botones */
+.pagination .page-item {
+  margin: 0 4px;
+}

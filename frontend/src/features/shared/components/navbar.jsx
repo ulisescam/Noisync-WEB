@@ -1,21 +1,26 @@
+import { Link } from "react-router-dom";
+import "../styles/navbar.css";
+import logo from "../../../assets/logo.png";
+
 function Navbar() {
     return (
         <header>
             <nav className="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
                 <div className="container">
 
-                    {/* Logo */}
-                    <a className="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="#">
+                    {/* Logo (redirige a Home) */}
+                    <Link to="/" className="navbar-brand d-flex align-items-center gap-2 fw-semibold">
                         <img
-                            src="https://cdn-icons-png.flaticon.com/512/727/727245.png"
+                            className='logoNav'
+                            src={logo}
                             alt="Noisync Logo"
                             width="28"
                             height="28"
                         />
                         Noisync
-                    </a>
+                    </Link>
 
-                    {/* Botón hamburguesa (responsive) */}
+                    {/* Botón hamburguesa */}
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -29,13 +34,21 @@ function Navbar() {
                     <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
                         <div className="d-flex gap-2">
 
-                            <button className="btn btn-outline-secondary btn-sm px-3">
+                            <Link
+                                to="/login"
+                                className="btn btn-outline-secondary btn-sm px-3"
+                                id='btnSesion'
+                            >
                                 Iniciar sesión
-                            </button>
+                            </Link>
 
-                            <button className="btn btn-dark btn-sm px-3">
+                            <Link
+                                to="/registro"
+                                className="btn btn-dark btn-sm px-3"
+                                id='btnRegistro'
+                            >
                                 Registrar banda
-                            </button>
+                            </Link>
 
                         </div>
                     </div>

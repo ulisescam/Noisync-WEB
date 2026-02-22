@@ -3,21 +3,23 @@ import SidebarLeader from "../features/admin/components/sidebarLeader";
 
 function LeaderLayout({ children }) {
     return (
-        <div className="d-flex flex-column vh-100">
+        <div className="vh-100 d-flex flex-column overflow-hidden">
 
-            {/* Navbar arriba */}
+            {/* Navbar fija arriba */}
             <NavbarLeader />
 
-            {/* Contenido debajo */}
-            <div className="d-flex flex-grow-1">
+            {/* Contenedor principal */}
+            <div className="d-flex flex-grow-1 overflow-hidden">
 
-                {/* Sidebar izquierda */}
-                <SidebarLeader />
+                {/* Sidebar fija */}
+                <div style={{ width: "240px" }} className="border-end bg-white">
+                    <SidebarLeader />
+                </div>
 
-                {/* Área principal */}
-                <main className="flex-fill p-4 bg-light">
+                {/* Solo esta parte tendrá scroll */}
+                <div className="flex-fill overflow-auto p-4 bg-light">
                     {children}
-                </main>
+                </div>
 
             </div>
         </div>

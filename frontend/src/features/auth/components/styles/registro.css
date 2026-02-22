@@ -1,0 +1,10 @@
+.registro-card {
+  width: 100%;
+  max-width: 620px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  margin: auto;
+}
+

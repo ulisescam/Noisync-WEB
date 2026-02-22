@@ -1,0 +1,47 @@
+/* 
+.login-header {
+  height: 70px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid #eaeaea;
+}*/
+
+
+.brand-title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.back-link {
+  position: absolute;
+  left: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #000;
+}
+
+/* Card */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  margin: auto;
+}
+
+
+
+/* Links */
+.link-text {
+  color: #000;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}

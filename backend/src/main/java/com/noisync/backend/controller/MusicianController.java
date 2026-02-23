@@ -3,6 +3,7 @@ package com.noisync.backend.controller;
 import com.noisync.backend.dto.InstrumentResponse;
 import com.noisync.backend.dto.MusicianResponse;
 import com.noisync.backend.service.MusicianInstrumentService;
+import com.noisync.backend.service.MusicianService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/musicians")
 public class MusicianController {
-
     private final MusicianInstrumentService service;
+    private final MusicianService musicianService;
 
-    public MusicianController(MusicianInstrumentService service) {
+    public MusicianController(MusicianInstrumentService service, MusicianService musicianService) {
         this.service = service;
+        this.musicianService = musicianService;
     }
-
     private Long bandId(Authentication auth) {
         @SuppressWarnings("unchecked")
         Map<String, Object> details = (Map<String, Object>) auth.getDetails();
@@ -62,5 +63,21 @@ public class MusicianController {
         if (!isLeader(auth)) throw new IllegalArgumentException("Solo un lider puede quitar instrumentos");
         service.unassign(bandId(auth), musicianId, instrumentId);
         return Map.of("ok", true, "message", "Instrumento removido");
+    }
+    @DeleteMapping("/{musicianId}")
+    public Map<String, Object> softRemove(@PathVariable Long musicianId,
+                                          @RequestParam(defaultValue = "false") boolean removeInstruments,
+                                          Authentication auth) {
+        if (!isLeader(auth)) throw new IllegalArgumentException("Solo un lider puede sacar musicos");
+        musicianService.softRemoveMusician(bandId(auth), musicianId, removeInstruments);
+        return Map.of("ok", true, "message", "Musico removido");
+    }
+    @PutMapping("/{musicianId}/activate")
+    public Map<String, Object> activate(@PathVariable Long musicianId,
+                                        @RequestParam(defaultValue = "false") boolean forcePasswordChange,
+                                        Authentication auth) {
+        if (!isLeader(auth)) throw new IllegalArgumentException("Solo un lider puede activar musicos");
+        musicianService.activateMusician(bandId(auth), musicianId, forcePasswordChange);
+        return Map.of("ok", true, "message", "Musico activado");
     }
 }

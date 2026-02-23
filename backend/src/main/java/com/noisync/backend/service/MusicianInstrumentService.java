@@ -40,7 +40,7 @@ public class MusicianInstrumentService {
             FROM app_user u
             JOIN person p ON p.person_id = u.person_id
             WHERE u.band_id = ?
-              AND u.rol = 'MUSICIAN'
+              AND u.rol = 'MUSICIAN' AND u.activo = 1
             ORDER BY p.nombre_completo ASC
         """, musicianMapper, bandId);
     }

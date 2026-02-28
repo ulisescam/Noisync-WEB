@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import ProtectedRoute from "./routes/ProtectedRoute";
+
 import MainLayout from "./layouts/MainLayout";
 import HomeLeader from "./features/admin/pages/homeLeader";
 
@@ -26,8 +28,12 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/search-public-songs" element={<SongSeachPublic />} />
             <Route path="/vista-cancion-publica/:id" element={<VistaPublicaCancion />} />
-            <Route path="/home-leader" element={<HomeLeader />} />
             <Route path="/test-backend" element={<TestBackend />} />
+
+            {/* Rutas protegidas  */}
+            <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
+              <Route path="/home-leader" element={<HomeLeader />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

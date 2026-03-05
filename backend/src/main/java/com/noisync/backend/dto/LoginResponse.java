@@ -1,8 +1,10 @@
 package com.noisync.backend.dto;
 
 public record LoginResponse(
-        String token,
+        String accessToken,
+        String refreshToken,
         Long userId,
         Long bandId,
-        String role
+        String role,
+        boolean mustChangePassword
 ) {}

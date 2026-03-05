@@ -1,5 +1,6 @@
 package com.noisync.backend.controller;
 
+import com.noisync.backend.dto.PageResponse;
 import com.noisync.backend.dto.SongCreateRequest;
 import com.noisync.backend.dto.SongResponse;
 import com.noisync.backend.dto.SongUpdateRequest;
@@ -8,7 +9,6 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,13 +32,18 @@ public class SongController {
     }
 
     private boolean isLeader(Authentication auth) {
-        return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_LEADER"));
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_LEADER"));
     }
 
-    // READ (leader y musician)
+    // READ paginado (leader y musician)
     @GetMapping
-    public List<SongResponse> list(@RequestParam(required = false) String q, Authentication auth) {
-        return songService.list(bandId(auth), q);
+    public PageResponse<SongResponse> list(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication auth) {
+        return songService.list(bandId(auth), q, page, size);
     }
 
     @GetMapping("/{id}")
@@ -55,7 +60,10 @@ public class SongController {
 
     // UPDATE (solo leader)
     @PutMapping("/{id}")
-    public SongResponse update(@PathVariable Long id, @Valid @RequestBody SongUpdateRequest req, Authentication auth) {
+    public SongResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody SongUpdateRequest req,
+            Authentication auth) {
         if (!isLeader(auth)) throw new IllegalArgumentException("Solo un lider puede editar canciones");
         return songService.update(bandId(auth), userId(auth), id, req);
     }

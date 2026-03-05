@@ -1,5 +1,6 @@
 package com.noisync.backend.service;
 
+import com.noisync.backend.domain.AppUser;
 import com.noisync.backend.dto.AcceptInviteRequest;
 import com.noisync.backend.dto.InviteMusicianRequest;
 import com.noisync.backend.dto.InviteMusicianResponse;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.noisync.backend.repository.AppUserRepository;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -19,79 +21,122 @@ public class BandInviteService {
 
     private final JdbcTemplate jdbc;
     private final PasswordEncoder encoder;
+    private final AppUserRepository appUserRepository;
+    private final EmailVerificationService emailVerificationService;
+    private final EmailService emailService;
 
-    public BandInviteService(JdbcTemplate jdbc, PasswordEncoder encoder) {
+    public BandInviteService(
+            JdbcTemplate jdbc,
+            PasswordEncoder encoder,
+            AppUserRepository appUserRepository,
+            EmailVerificationService emailVerificationService,
+            EmailService emailService
+    ) {
         this.jdbc = jdbc;
         this.encoder = encoder;
+        this.appUserRepository = appUserRepository;
+        this.emailVerificationService = emailVerificationService;
+        this.emailService = emailService;
     }
+
 
     // ====== INVITE MUSICIAN (leader) ======
     @Transactional
-    public InviteMusicianResponse inviteMusician(Long bandId, InviteMusicianRequest req) {
+    public InviteMusicianResponse inviteMusician(
+            Long bandId,
+            InviteMusicianRequest req
+    ) {
 
-        // correo unico
-        Integer correoCount = jdbc.queryForObject(
-                "SELECT COUNT(*) FROM person WHERE LOWER(correo) = LOWER(?)",
-                Integer.class, req.correo()
-        );
-        if (correoCount != null && correoCount > 0) {
-            throw new IllegalArgumentException("Ese correo ya esta registrado");
-        }
-
-        // password temporal
-        String tempPassword = "Temp" + UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "1";
-        String passwordHash = encoder.encode(tempPassword);
-
+        // Validar username único
         Integer usernameCount = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM app_user WHERE LOWER(username) = LOWER(?)",
-                Integer.class, req.username()
+                Integer.class,
+                req.username()
         );
+
         if (usernameCount != null && usernameCount > 0) {
-            throw new IllegalArgumentException("Ese username ya esta registrado");
+            throw new IllegalArgumentException("Ese username ya está registrado");
         }
 
-        // 1) person
-        jdbc.update("""
-            INSERT INTO person (nombre_completo, telefono, correo, correo_verificado)
-            VALUES (?, ?, ?, 1)
-        """, req.nombreCompleto(), req.telefono(), req.correo());
+        // Validar correo único EN APP_USER
+        Integer correoCount = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM app_user WHERE LOWER(email) = LOWER(?)",
+                Integer.class,
+                req.correo()
+        );
 
-        Long personId = jdbc.queryForObject("SELECT MAX(person_id) FROM person", Long.class);
+        if (correoCount != null && correoCount > 0) {
+            throw new IllegalArgumentException("Ese correo ya está registrado");
+        }
 
-        // 2) app_user musician
+        // Password temporal segura
+        String tempPassword =
+                "Tmp" + UUID.randomUUID().toString()
+                        .replace("-", "")
+                        .substring(0, 8) + "1A";
+
+        String passwordHash = encoder.encode(tempPassword);
+
+        // Crear persona
         jdbc.update("""
-            INSERT INTO app_user (
-            person_id, band_id, rol, username, password_hash,
-            estatus, primer_login, activo, failed_attempts, locked_until
-            ) VALUES (?, ?, 'MUSICIAN', ?, ?, 'PENDIENTE', 1, 1, 0, NULL)
-         """, personId, bandId, req.username(), passwordHash);
+    INSERT INTO person (nombre_completo, telefono, correo, correo_verificado)
+    VALUES (?, ?, ?, 0)
+    """, req.nombreCompleto(), req.telefono(), req.correo());
+
+        Long personId = jdbc.queryForObject(
+                "SELECT MAX(person_id) FROM person",
+                Long.class
+        );
+
+        //  Crear app_user
+        jdbc.update("""
+        INSERT INTO app_user (
+            person_id,
+            band_id,
+            rol,
+            username,
+            password_hash,
+            email,
+            estatus,
+            primer_login,
+            activo,
+            failed_attempts,
+            locked_until
+        ) VALUES (?, ?, 'MUSICIAN', ?, ?, ?, 'PENDIENTE', 1, 1, 0, NULL)
+    """,
+                personId,
+                bandId,
+                req.username(),
+                passwordHash,
+                req.correo()
+        );
 
         Long userId = jdbc.queryForObject("SELECT MAX(user_id) FROM app_user", Long.class);
 
-        // 3) invitation
-        String token = UUID.randomUUID().toString().replace("-", "");
-        String tokenHash = sha256Hex(token);
 
-        // expira en 24h
-        long hours = 24;
-        jdbc.update("""
-            INSERT INTO band_invitation (
-              user_id, band_id, token_hash, fecha_expiracion, fecha_aceptacion, estatus
-            ) VALUES (?, ?, ?, (SYSTIMESTAMP + NUMTODSINTERVAL(?, 'HOUR')), NULL, 'PENDIENTE')
-        """, userId, bandId, tokenHash, hours);
-
-        // DEV: devolvemos token/tempPassword para probar.
-        // En prod: aqui mandarias correo con link/token.
         return new InviteMusicianResponse(
                 true,
                 userId,
                 req.correo(),
                 req.username(),
                 tempPassword,
-                token
+                null
         );
     }
 
+    public void sendInvitationEmails(Long userId, String correo, String tempPassword) {
+        AppUser musician = appUserRepository.findById(userId).orElseThrow();
+
+        emailVerificationService.sendVerification(musician);
+
+        emailService.send(
+                correo,
+                "Noisync - Invitación a la banda",
+                "Has sido invitado.\n\n" +
+                        "Tu contraseña temporal es: " + tempPassword +
+                        "\nPrimero verifica tu correo."
+        );
+    }
     // ====== ACCEPT INVITE (musician) ======
     @Transactional
     public String acceptInvite(AcceptInviteRequest req) {

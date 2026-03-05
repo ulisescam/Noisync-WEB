@@ -1,7 +1,7 @@
 package com.noisync.backend.domain;
 
 import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime; // <-- Cambiamos la importación
 
 @Entity
 @Table(name = "APP_USER")
@@ -25,6 +25,17 @@ public class AppUser {
     @Column(name = "USERNAME")
     private String username;
 
+    @Column(name = "email", nullable = false, unique = true)
+    private String correo;
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
     @Column(name = "PASSWORD_HASH", nullable = false)
     private String passwordHash;
 
@@ -41,7 +52,7 @@ public class AppUser {
     private Integer failedAttempts;
 
     @Column(name = "LOCKED_UNTIL")
-    private Instant lockedUntil;
+    private LocalDateTime lockedUntil; // <-- Limpiamos la declaración
 
     // ===== GETTERS / SETTERS =====
     public Long getUserId() { return userId; }
@@ -74,6 +85,7 @@ public class AppUser {
     public Integer getFailedAttempts() { return failedAttempts; }
     public void setFailedAttempts(Integer failedAttempts) { this.failedAttempts = failedAttempts; }
 
-    public Instant getLockedUntil() { return lockedUntil; }
-    public void setLockedUntil(Instant lockedUntil) { this.lockedUntil = lockedUntil; }
+
+    public LocalDateTime getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
 }

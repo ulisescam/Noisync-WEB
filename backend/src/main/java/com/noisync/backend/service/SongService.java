@@ -1,5 +1,6 @@
 package com.noisync.backend.service;
 
+import com.noisync.backend.dto.PageResponse;
 import com.noisync.backend.dto.SongCreateRequest;
 import com.noisync.backend.dto.SongResponse;
 import com.noisync.backend.dto.SongUpdateRequest;
@@ -64,29 +65,51 @@ public class SongService {
         }
     }
 
-    // LIST (por banda) + búsqueda opcional
-    public List<SongResponse> list(Long bandId, String q) {
+    public PageResponse<SongResponse> list(Long bandId, String q, int page, int size) {
+        int offset = page * size;
+        String baseWhere = q == null || q.isBlank() ? "" :
+                " AND (LOWER(titulo) LIKE ? OR LOWER(artista_autor) LIKE ?)";
+
+        // Query paginada
+        String sql = """
+        SELECT song_id, band_id, titulo, artista_autor, bpm, tono_original, escala_base,
+               visibilidad, estatus, cover_url, fecha_creacion, fecha_actualizacion
+        FROM song
+        WHERE band_id = ?
+          AND estatus = 'ACTIVO'
+        """ + baseWhere + """
+        ORDER BY fecha_creacion DESC
+        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    """;
+
+        // Query para total
+        String countSql = """
+        SELECT COUNT(*) FROM song
+        WHERE band_id = ? AND estatus = 'ACTIVO'
+        """ + baseWhere;
+
+        List<SongResponse> content;
+        Long total;
+
         if (q == null || q.isBlank()) {
-            return jdbc.query("""
-                SELECT song_id, band_id, titulo, artista_autor, bpm, tono_original, escala_base,
-                       visibilidad, estatus, cover_url, fecha_creacion, fecha_actualizacion
-                FROM song
-                WHERE band_id = ?
-                  AND estatus = 'ACTIVO'
-                ORDER BY fecha_creacion DESC
-            """, songMapper, bandId);
+            content = jdbc.query(sql, songMapper, bandId, offset, size);
+            total = jdbc.queryForObject(countSql, Long.class, bandId);
+        } else {
+            String like = "%" + q.trim().toLowerCase() + "%";
+            content = jdbc.query(sql, songMapper, bandId, like, like, offset, size);
+            total = jdbc.queryForObject(countSql, Long.class, bandId, like, like);
         }
 
-        String like = "%" + q.trim().toLowerCase() + "%";
-        return jdbc.query("""
-            SELECT song_id, band_id, titulo, artista_autor, bpm, tono_original, escala_base,
-                   visibilidad, estatus, cover_url, fecha_creacion, fecha_actualizacion
-            FROM song
-            WHERE band_id = ?
-              AND estatus = 'ACTIVO'
-              AND (LOWER(titulo) LIKE ? OR LOWER(artista_autor) LIKE ?)
-            ORDER BY fecha_creacion DESC
-        """, songMapper, bandId, like, like);
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        return new PageResponse<>(
+                content,
+                page,
+                size,
+                total,
+                totalPages,
+                page >= totalPages - 1
+        );
     }
 
     // GET (por banda)

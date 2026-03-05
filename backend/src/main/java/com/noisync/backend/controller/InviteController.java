@@ -23,7 +23,6 @@ public class InviteController {
     // Solo leader
     @PostMapping("/band/invite")
     public InviteMusicianResponse invite(@Valid @RequestBody InviteMusicianRequest req, Authentication auth) {
-        // validar rol leader
         boolean isLeader = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_LEADER"));
         if (!isLeader) throw new IllegalArgumentException("Solo un lider puede invitar musicos");
@@ -32,13 +31,13 @@ public class InviteController {
         Map<String, Object> details = (Map<String, Object>) auth.getDetails();
         Long bandId = ((Number) details.get("bandId")).longValue();
 
-        return inviteService.inviteMusician(bandId, req);
-    }
+        // 1. Transacción hace commit
+        InviteMusicianResponse response = inviteService.inviteMusician(bandId, req);
 
-    // Publico: aceptar invitacion
-    @PostMapping("/auth/accept-invite")
-    public Map<String, Object> accept(@Valid @RequestBody AcceptInviteRequest req) {
-        String msg = inviteService.acceptInvite(req);
-        return Map.of("ok", true, "message", msg);
+        // 2. Correos fuera de la transacción
+        inviteService.sendInvitationEmails(response.musicianUserId(), req.correo(), response.tempPassword());
+
+        // 3. Devolver response sin exponer la contraseña temporal
+        return new InviteMusicianResponse(response.invited(), response.musicianUserId(), response.correo(), response.username(), null, null);
     }
 }

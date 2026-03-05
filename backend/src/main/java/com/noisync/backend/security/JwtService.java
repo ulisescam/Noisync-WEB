@@ -1,8 +1,8 @@
 package com.noisync.backend.security;
 
+import com.noisync.backend.domain.AppUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,24 +19,29 @@ public class JwtService {
     private final long expirationMillis;
 
     public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-minutes}") long expMinutes
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.access-token-minutes}") long expMinutes
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMillis = expMinutes * 60_000L;
     }
 
-    public String generateToken(Long userId, Long bandId, String role) {
+    public String generateToken(AppUser user) {
+
         long now = System.currentTimeMillis();
         Date issuedAt = new Date(now);
         Date exp = new Date(now + expirationMillis);
 
         return Jwts.builder()
-                .subject(String.valueOf(userId))
+                .subject(String.valueOf(user.getUserId()))
                 .issuedAt(issuedAt)
                 .expiration(exp)
-                .claims(Map.of("bandId", bandId, "role", role))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .claims(Map.of(
+                        "bandId", user.getBandId(),
+                        "role", user.getRol(),
+                        "primerLogin", user.getPrimerLogin()
+                ))
+                .signWith(key)
                 .compact();
     }
 
@@ -46,5 +51,14 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public boolean isValid(String token) {
+        try {
+            parse(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

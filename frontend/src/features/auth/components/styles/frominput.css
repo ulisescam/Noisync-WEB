@@ -1,7 +1,6 @@
-/* Inputs */
 .custom-input {
   height: 45px;
-  border-radius: 8px;
+  border-radius: 8px;   
   border: 1px solid #ddd;
 }
 
@@ -26,3 +25,34 @@
 .link-text:hover {
   text-decoration: underline;
 }
+
+
+
+/* Botón del ojo (input-group-text) */
+.password-toggle {
+  background: #fff;
+  cursor: pointer;
+  border-left: 0; /* para que se vea pegado al input */
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+/* Icono del ojo */
+.password-toggle i {
+  font-size: 18px;
+  color: #6c757d;
+}
+
+/* Cuando es inválido, que el botón del ojo también se vea conectado */
+.is-invalid + .password-toggle {
+  border-color: #dc3545; /* bootstrap danger */
+}
+
+/* Cuando es válido, igual */
+.is-valid + .password-toggle {
+  border-color: #198754; /* bootstrap success */
+}
+

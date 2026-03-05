@@ -5,27 +5,50 @@ import FormInput from "../components/FormInput";
 import "../components/styles/login.css";
 
 import { loginRequest, saveSession } from "../../../api/authService";
+import useForm from "../../hooks/useForm";
 
 function Login() {
     const navigate = useNavigate();
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const [email, setEmail] = useState("");      // aquí guardamos "correo o usuario"
-    const [password, setPassword] = useState("");
-    const [errorMsg, setErrorMsg] = useState(""); // para mostrar error
+    const initialValues = {
+        identifier: "",
+        password: "",
+    };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const validar = (values) => {
+        const e = {};
+        const { identifier, password } = values;
+
+        const value = identifier.trim();
+
+        if (!value) {
+            e.identifier = "El usuario o correo es obligatorio";
+        } else if (value.includes("@")) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) e.identifier = "Correo inválido";
+        }
+
+        if (!password.trim()) {
+            e.password = "La contraseña es obligatoria";
+        }
+
+        return e;
+    };
+
+    const { values, errors, submitIntentado, handleChange, handleSubmit } =
+        useForm(initialValues, validar);
+
+    const onValidSubmit = async (vals) => {
         setErrorMsg("");
 
         try {
-            // backend espera: { identifier, password }
-            const data = await loginRequest(email, password);
+            const data = await loginRequest(vals.identifier, vals.password);
 
             saveSession(data);
 
-            // redirección por rol
             if (data.role === "LEADER") navigate("/home-leader");
-            else navigate("/"); // o crea /home-musician si quieres
+            else navigate("/");
         } catch (err) {
             const backendMsg =
                 err?.response?.data?.message ||
@@ -45,39 +68,48 @@ function Login() {
                     Accede a tu cuenta de Noisync
                 </p>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onValidSubmit)} noValidate>
                     <FormInput
+                        name="identifier"
+                        type="text"
                         label="Correo o usuario"
-                        placeholder="tu@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="usuario o tu@email.com"
+                        value={values.identifier}
+                        onChange={handleChange}
                         required
+                        error={errors.identifier}
+                        forceValidate={submitIntentado}
                     />
 
                     <FormInput
+                        name="password"
                         label="Contraseña"
                         type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Ingresa tu contraseña"
+                        value={values.password}
+                        onChange={handleChange}
                         required
+                        error={errors.password}
+                        forceValidate={submitIntentado}
                     />
 
-                    {/* error visible */}
                     {errorMsg && (
                         <div className="alert alert-danger py-2 mt-2 mb-0">
                             {errorMsg}
                         </div>
                     )}
 
-                    <button type="submit" className="btn btn-dark w-100 custom-btn mt-3">
+                    <button
+                        type="submit"
+                        className="btn btn-dark w-100 custom-btn mt-3"
+                    >
                         Entrar
                     </button>
                 </form>
 
                 <div className="text-center mt-4 small">
                     <Link to="/forgot-password" className="link-text">
-                        ¿olvidaste tu contraseña?
+                        ¿Olvidaste tu contraseña?
                     </Link>
                     <br />
                     ¿No tienes cuenta?{" "}

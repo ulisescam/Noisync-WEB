@@ -3,85 +3,144 @@ import { Link } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/registro.css";
+import useForm from "../../hooks/useForm";
 
 function Registro() {
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Formulario enviado");
+    const initialValues = {
+        nombre: "",
+        nombreUsuario: "",
+        email: "",
+        password: "",
+        confirmarPassword: "",
+        nombreBanda: "",
     };
 
-    const [nombre, setNombre] = useState("");
-    const [nombreUsuario, setNombreUsuario] = useState("");
-    const [email, setEmail] = useState("");
-    const [contraseña, setContraseña] = useState("");
-    const [confirmarContraseña, setConfirmarContraseña] = useState("");
-    const [nombreBanda, setNombreBanda] = useState("");
+    const validar = (values) => {
+        const e = {};
+        const { nombre, nombreUsuario, email, password, confirmarPassword, nombreBanda } = values;
+
+        if (!nombre.trim()) e.nombre = "El nombre completo es obligatorio";
+        if (!nombreUsuario.trim()) e.nombreUsuario = "El nombre de usuario es obligatorio";
+
+        const emailValue = email.trim();
+        if (!emailValue) {
+            e.email = "El correo es obligatorio";
+        } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailValue)) e.email = "Correo inválido";
+        }
+
+        if (!password.trim()) {
+            e.password = "La contraseña es obligatoria";
+        } else {
+            const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passRegex.test(password)) {
+                e.password = "Mín 8 caracteres, 1 mayúscula, 1 minúscula y 1 número";
+            }
+        }
+
+        if (!confirmarPassword.trim()) {
+            e.confirmarPassword = "Confirma tu contraseña";
+        } else if (confirmarPassword !== password) {
+            e.confirmarPassword = "Las contraseñas no coinciden";
+        }
+
+        if (!nombreBanda.trim()) e.nombreBanda = "El nombre de la banda es obligatorio";
+
+        return e;
+    };
+
+    const {
+        values,
+        errors,
+        submitIntentado,
+        handleChange,
+        handleSubmit,
+    } = useForm(initialValues, validar);
+
+    const onValidSubmit = (vals) => {
+        console.log("Formulario válido:", vals);
+        // aquí luego llamas a tu API (register) y listo
+    };
 
     return (
         <div className="registro-page">
             <AuthHeader />
+
             <div className="registro-card">
                 <h2 className="fw-bold text-center mb-2">Registro</h2>
-                <p className="text-muted text-center mb-4">
-                    Crea tu cuenta de Noisync
-                </p>
-                <form onSubmit={handleSubmit}>
+                <p className="text-muted text-center mb-4">Crea tu cuenta de Noisync</p>
 
+                <form onSubmit={handleSubmit(onValidSubmit)} noValidate>
                     <FormInput
                         label="Nombre Completo"
-                        type="text"
-
+                        name="nombre"
                         placeholder="Ingresa tu nombre completo"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
+                        value={values.nombre}
+                        onChange={handleChange}
                         required
+                        error={errors.nombre}
+                        forceValidate={submitIntentado}
                     />
+
                     <FormInput
                         label="Nombre de usuario"
-                        type="text"
-
-                        placeholder="Elige de usuario"
-                        value={nombreUsuario}
-                        onChange={(e) => setNombreUsuario(e.target.value)}
+                        name="nombreUsuario"
+                        placeholder="Ingresa tu usuario"
+                        value={values.nombreUsuario}
+                        onChange={handleChange}
                         required
+                        error={errors.nombreUsuario}
+                        forceValidate={submitIntentado}
                     />
+
                     <FormInput
                         label="Correo Electrónico"
-                        type="email"
-
+                        name="email"
+                        type="text"
                         placeholder="tu@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={values.email}
+                        onChange={handleChange}
                         required
+                        error={errors.email}
+                        forceValidate={submitIntentado}
                     />
+
                     <FormInput
                         label="Contraseña"
+                        name="password"
                         type="password"
-
                         placeholder="Ingresa tu contraseña"
-                        value={contraseña}
-                        onChange={(e) => setContraseña(e.target.value)}
+                        value={values.password}
+                        onChange={handleChange}
                         required
+                        error={errors.password}
+                        forceValidate={submitIntentado}
                     />
+
                     <FormInput
                         label="Confirmar Contraseña"
+                        name="confirmarPassword"
                         type="password"
-
-                        placeholder="Confirma tu contraseña"
-                        value={confirmarContraseña}
-                        onChange={(e) => setConfirmarContraseña(e.target.value)}
+                        placeholder="Repite tu contraseña"
+                        value={values.confirmarPassword}
+                        onChange={handleChange}
                         required
+                        error={errors.confirmarPassword}
+                        forceValidate={submitIntentado}
                     />
+
                     <FormInput
                         label="Nombre de la banda"
-                        type="text"
-
-                        placeholder="Ingresa el nombre de tu banda"
-                        value={nombreBanda}
-                        onChange={(e) => setNombreBanda(e.target.value)}
+                        name="nombreBanda"
+                        placeholder="Ingresa el nombre de la banda"
+                        value={values.nombreBanda}
+                        onChange={handleChange}
                         required
+                        error={errors.nombreBanda}
+                        forceValidate={submitIntentado}
                     />
+
                     <p className="text-muted text-center mb-4">
                         Se creará la banda automáticamente y quedarás como Líder
                     </p>
@@ -90,16 +149,16 @@ function Registro() {
                         Crear Cuenta
                     </button>
                 </form>
+
                 <div className="text-center mt-4 small">
                     ¿Ya tienes cuenta?{" "}
                     <Link to="/login" className="link-text">
                         Iniciar sesión
                     </Link>
-
                 </div>
-
             </div>
         </div>
     );
 }
+
 export default Registro;

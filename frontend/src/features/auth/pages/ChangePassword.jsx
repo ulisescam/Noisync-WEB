@@ -1,104 +1,105 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/changePassword.css";
+import useForm from "../../hooks/useForm";
 
 
 function ChangePassword() {
-
     const navigate = useNavigate();
 
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
-    const handleBack = () => {
-        if (window.history.length > 1) {
-            navigate(-1);
-        } else {
-            navigate("/");
-        }
+    const initialValues = {
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const validar = (values) => {
+        const e = {};
+        const { currentPassword, newPassword, confirmPassword } = values;
 
+        if (!currentPassword.trim()) e.currentPassword = "La contraseña actual es obligatoria";
 
+        if (!newPassword.trim()) {
+            e.newPassword = "La nueva contraseña es obligatoria";
+        } else {
+            const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passRegex.test(newPassword)) {
+                e.newPassword = "Mín 8 caracteres, 1 mayúscula, 1 minúscula y 1 número";
+            }
+        }
 
-        console.log({
-            currentPassword,
-            newPassword,
-            confirmPassword
-        });
+        if (!confirmPassword.trim()) {
+            e.confirmPassword = "Confirma tu nueva contraseña";
+        } else if (confirmPassword !== newPassword) {
+            e.confirmPassword = "Las contraseñas no coinciden";
+        }
+
+        return e;
+    };
+
+    const { values, errors, submitIntentado, handleChange, handleSubmit } =
+        useForm(initialValues, validar);
+
+    const onValidSubmit = async (vals) => {
+        console.log("Formulario válido:", vals);
+
+        // llamar api
+        navigate("/login", { replace: true });
     };
 
     return (
         <div className="change-password-page">
-
             <AuthHeader />
 
-
             <div className="change-card">
-
-                <h2 className="fw-bold text-center mb-2">
-                    Cambio de contraseña obligatorio
-                </h2>
+                <h2 className="fw-bold text-center mb-2">Cambio de contraseña obligatorio</h2>
 
                 <p className="text-muted text-center mb-4">
                     Este paso es requerido para activar tu cuenta
                 </p>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onValidSubmit)} noValidate>
+                    <FormInput
+                        name="currentPassword"
+                        label="Contraseña actual"
+                        type="password"
+                        placeholder="Ingresa tu contraseña actual"
+                        value={values.currentPassword}
+                        onChange={handleChange}
+                        required
+                        error={errors.currentPassword}
+                        forceValidate={submitIntentado}
+                    />
 
-                    <div className="mb-3">
-                        <FormInput
-                            label="Contraseña actual"
-                            type="password"
+                    <FormInput
+                        name="newPassword"
+                        label="Nueva contraseña"
+                        type="password"
+                        placeholder="Ingresa tu nueva contraseña"
+                        value={values.newPassword}
+                        onChange={handleChange}
+                        required
+                        error={errors.newPassword}
+                        forceValidate={submitIntentado}
+                    />
 
-                            placeholder="Ingresa tu contraseña actual"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <FormInput
+                        name="confirmPassword"
+                        label="Confirmar Nueva Contraseña"
+                        type="password"
+                        placeholder="Confirma tu nueva contraseña"
+                        value={values.confirmPassword}
+                        onChange={handleChange}
+                        required
+                        error={errors.confirmPassword}
+                        forceValidate={submitIntentado}
+                    />
 
-                    <div className="mb-3">
-                        <FormInput
-                            label="Nueva contraseña"
-                            type="password"
-
-                            placeholder="Ingresa tu nueva contraseña"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <FormInput
-                            label="Confirmar Nueva Contraseña"
-                            type="password"
-
-                            placeholder="Confirma tu nueva contraseña"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="btn btn-dark w-100"
-                        disabled={
-                            !currentPassword ||
-                            !newPassword ||
-                            !confirmPassword
-                        }
-                    >
+                    <button type="submit" className="btn btn-dark w-100">
                         Actualizar
                     </button>
-
                 </form>
 
                 <hr className="my-4" />
@@ -106,7 +107,6 @@ function ChangePassword() {
                 <p className="text-muted text-center small">
                     Una vez actualizada tu contraseña, podrás acceder a todas las funcionalidades de tu cuenta
                 </p>
-
             </div>
         </div>
     );

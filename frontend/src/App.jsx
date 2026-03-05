@@ -18,25 +18,25 @@ import TestBackend from "./pages/TestBackend";
 
 function App() {
   return (
-      <BrowserRouter>
-        <Routes>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/registro" element={<Registro />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/search-public-songs" element={<SongSeachPublic />} />
-            <Route path="/vista-cancion-publica/:id" element={<VistaPublicaCancion />} />
-            <Route path="/test-backend" element={<TestBackend />} />
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/search-public-songs" element={<SongSeachPublic />} />
+          <Route path="/vista-cancion-publica/:id" element={<VistaPublicaCancion />} />
+          <Route path="/test-backend" element={<TestBackend />} />
 
-            {/* Rutas protegidas  */}
-            <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
-              <Route path="/home-leader" element={<HomeLeader />} />
-            </Route>
+          {/* Rutas protegidas */}
+          <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
+            <Route path="/home-leader" element={<HomeLeader />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -17,7 +17,6 @@ function MusiciansTable({ musicians, isLeader, onEdit, onDelete }) {
                             {isLeader && (
                                 <th className="text-secondary">ACCIONES</th>
                             )}
-
                         </tr>
                     </thead>
 
@@ -25,7 +24,7 @@ function MusiciansTable({ musicians, isLeader, onEdit, onDelete }) {
 
                         {musicians.map((musician) => (
                             <MusicianRow
-                                key={musician.id}
+                                key={musician.userId}
                                 musician={musician}
                                 isLeader={isLeader}
                                 onEdit={onEdit}

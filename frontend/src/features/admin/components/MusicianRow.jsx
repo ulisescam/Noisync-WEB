@@ -1,25 +1,27 @@
 function MusicianRow({ musician, isLeader, onEdit, onDelete }) {
 
     console.log("isLeader:", isLeader);
+
     return (
 
         <tr>
 
-            <td>{musician.name}</td>
+            <td>{musician.nombreCompleto}</td>
 
             <td className="text-muted">
-                {musician.email}
+                {musician.correo}
             </td>
 
             <td>
-                {musician.instrument}
+                {musician.instrumento || "—"}
+
             </td>
 
-            <td>{musician.role}</td>
+            <td>{musician.username}</td>
 
             <td>
                 <span className="badge bg-success-subtle text-success">
-                    {musician.status}
+                    {musician.estatus}
                 </span>
             </td>
 
@@ -36,7 +38,7 @@ function MusicianRow({ musician, isLeader, onEdit, onDelete }) {
 
                         <button
                             className="btn btn-sm btn-outline-danger"
-                            onClick={() => onDelete(musician.id)}
+                            onClick={() => onDelete(musician.userId)}
                         >
                             <i className="bi bi-trash"></i>
                         </button>

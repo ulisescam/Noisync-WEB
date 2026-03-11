@@ -4,6 +4,8 @@ import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/registro.css";
 import useForm from "../../hooks/useForm";
+import { registerRequest, saveSession } from "../../../api/authService.js";
+
 
 function Registro() {
     const initialValues = {
@@ -58,9 +60,28 @@ function Registro() {
         handleSubmit,
     } = useForm(initialValues, validar);
 
-    const onValidSubmit = (vals) => {
-        console.log("Formulario válido:", vals);
-        // aquí luego llamas a tu API (register) y listo
+    const onValidSubmit = async (vals) => {
+        try {
+
+            const body = {
+                nombreCompleto: vals.nombre,
+                username: vals.nombreUsuario,
+                correo: vals.email,
+                password: vals.password,
+                confirmPassword: vals.confirmarPassword,
+                nombreBanda: vals.nombreBanda
+            };
+
+            const data = await registerRequest(body);
+
+            saveSession(data);
+
+            window.location.href = "/home-leader";
+
+        } catch (err) {
+            console.error(err);
+            alert(err?.response?.data?.message || "Error al registrar");
+        }
     };
 
     return (

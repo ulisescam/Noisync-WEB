@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { api } from "../../../api/api";
 
 function InviteMusicianCard({ onBack }) {
 
     const [form, setForm] = useState({
         name: "",
         email: "",
-        instrument: "Guitarra",
-        role: "Músico",
-        message: ""
+        username: "",
+        telefono: ""
     });
+
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({
@@ -17,14 +19,53 @@ function InviteMusicianCard({ onBack }) {
         });
     };
 
-    const handleSubmit = (e) => {
+    const generateUsername = (name) => {
+        return name
+            .toLowerCase()
+            .replace(/\s+/g, "")
+            .replace(/[^a-z0-9]/g, "");
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Invitación enviada:", form);
+        setLoading(true);
 
-        alert("Invitación enviada (simulado)");
+        try {
 
-        onBack(); // vuelve a la tabla después de enviar
+            const usernameFinal =
+                form.username.trim() !== ""
+                    ? form.username
+                    : generateUsername(form.name);
+
+            const response = await api.post("/api/band/invite", {
+                nombreCompleto: form.name,
+                correo: form.email,
+                username: usernameFinal,
+                telefono: form.telefono
+            });
+
+            console.log("Invitación enviada:", response.data);
+
+            alert("Invitación enviada correctamente");
+
+            onBack();
+
+        } catch (error) {
+
+            console.error(error);
+
+            if (error.response?.status === 403) {
+                alert("No tienes permisos para invitar músicos");
+            } else if (error.response?.status === 409) {
+                alert("Ese correo o username ya está registrado");
+            } else {
+                alert("No se pudo enviar la invitación");
+            }
+
+        }
+
+        setLoading(false);
     };
 
     return (
@@ -33,7 +74,6 @@ function InviteMusicianCard({ onBack }) {
 
             <div className="card-body p-4">
 
-                {/* VOLVER */}
                 <button
                     className="btn btn-sm btn-light mb-3"
                     onClick={onBack}
@@ -42,7 +82,6 @@ function InviteMusicianCard({ onBack }) {
                     Volver
                 </button>
 
-                {/* HEADER */}
                 <div className="d-flex align-items-center mb-3">
 
                     <div
@@ -58,7 +97,7 @@ function InviteMusicianCard({ onBack }) {
                         </h5>
 
                         <small className="text-muted">
-                            Agrega un nuevo integrante enviándole una invitación por correo electrónico
+                            Envía una invitación a un nuevo integrante
                         </small>
                     </div>
 
@@ -66,9 +105,10 @@ function InviteMusicianCard({ onBack }) {
 
                 <form onSubmit={handleSubmit}>
 
+                    {/* NOMBRE */}
                     <div className="mb-3">
                         <label className="form-label">
-                            Nombre del músico
+                            Nombre completo
                         </label>
 
                         <input
@@ -82,7 +122,7 @@ function InviteMusicianCard({ onBack }) {
                         />
                     </div>
 
-
+                    {/* CORREO */}
                     <div className="mb-3">
                         <label className="form-label">
                             Correo electrónico
@@ -99,71 +139,59 @@ function InviteMusicianCard({ onBack }) {
                         />
                     </div>
 
-
-                    <div className="row mb-3">
-
-                        <div className="col-md-6">
-
-                            <label className="form-label">
-                                Instrumento
-                            </label>
-
-                            <select
-                                className="form-select"
-                                name="instrument"
-                                value={form.instrument}
-                                onChange={handleChange}
-                            >
-                                <option>Guitarra</option>
-                                <option>Bajo</option>
-                                <option>Batería</option>
-                                <option>Teclado</option>
-                                <option>Voz</option>
-                            </select>
-
-                        </div>
-
-
-
-                    </div>
-
-
+                    {/* USERNAME OPCIONAL */}
                     <div className="mb-3">
-
                         <label className="form-label">
-                            Mensaje de invitación
+                            Username
                             <span className="text-muted"> (opcional)</span>
                         </label>
 
-                        <textarea
+                        <input
+                            type="text"
                             className="form-control"
-                            rows="4"
-                            name="message"
-                            value={form.message}
+                            name="username"
+                            placeholder="Se generará automáticamente si se deja vacío"
+                            value={form.username}
                             onChange={handleChange}
                         />
-
                     </div>
 
+                    {/* TELEFONO */}
+                    <div className="mb-3">
+                        <label className="form-label">
+                            Teléfono
+                            <span className="text-muted"> (opcional)</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="telefono"
+                            placeholder="Ej: 7771234567"
+                            value={form.telefono}
+                            onChange={handleChange}
+                        />
+                    </div>
 
                     <div className="alert alert-light border small">
 
                         <i className="bi bi-info-circle me-2"></i>
 
-                        Se enviará una invitación por correo electrónico al músico.
-                        Podrá aceptar o rechazar la invitación desde su bandeja de entrada.
+                        Se enviará una invitación por correo al músico con su acceso temporal.
 
                     </div>
-
 
                     <div className="d-flex gap-2">
 
                         <button
                             type="submit"
                             className="btn btn-dark"
+                            disabled={loading}
                         >
-                            <i className="bi bi-envelope me-2"></i>
-                            Enviar invitación
+                            {loading
+                                ? "Enviando..."
+                                : <><i className="bi bi-envelope me-2"></i>Enviar invitación</>
+                            }
                         </button>
 
                         <button

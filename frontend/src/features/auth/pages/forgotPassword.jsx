@@ -4,6 +4,8 @@ import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/changePassword.css";
 import useForm from "../../hooks/useForm";
+import { api } from "../../../api/api";
+
 
 
 function ForgotPassword() {
@@ -33,11 +35,23 @@ function ForgotPassword() {
         useForm(initialValues, validar);
 
     const onValidSubmit = async (vals) => {
-        console.log("Forgot Password:", vals);
+        try {
 
-        // llamar api
+            await api.post("/api/auth/forgot-password", {
+                email: vals.email
+            });
 
-        navigate("/login", { replace: true });
+            alert("Se enviaron instrucciones a tu correo");
+            navigate("/login", { replace: true });
+
+        } catch (error) {
+
+            const msg =
+                error?.response?.data?.message ||
+                "No se pudo enviar la recuperación";
+
+            alert(msg);
+        }
     };
 
     return (

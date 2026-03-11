@@ -40,4 +40,4 @@ public class InviteController {
         // 3. Devolver response sin exponer la contraseña temporal
         return new InviteMusicianResponse(response.invited(), response.musicianUserId(), response.correo(), response.username(), null, null);
     }
-}
+} 

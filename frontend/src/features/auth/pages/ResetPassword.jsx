@@ -1,27 +1,25 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/changePassword.css";
 import useForm from "../../hooks/useForm";
 import { api } from "../../../api/api";
 
+function ResetPassword() {
 
-
-function ChangePassword() {
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+    const token = params.get("token");
 
     const initialValues = {
-        currentPassword: "",
         newPassword: "",
-        confirmPassword: "",
+        confirmPassword: ""
     };
 
     const validar = (values) => {
-        const e = {};
-        const { currentPassword, newPassword, confirmPassword } = values;
 
-        if (!currentPassword.trim()) e.currentPassword = "La contraseña actual es obligatoria";
+        const e = {};
+        const { newPassword, confirmPassword } = values;
 
         if (!newPassword.trim()) {
             e.newPassword = "La nueva contraseña es obligatoria";
@@ -48,15 +46,13 @@ function ChangePassword() {
 
         try {
 
-            await api.post("/api/auth/change-password", {
-                currentPassword: vals.currentPassword,
+            await api.post("/api/auth/reset-password", {
+                token: token,
                 newPassword: vals.newPassword,
                 confirmPassword: vals.confirmPassword
             });
 
             alert("Contraseña actualizada correctamente");
-
-            localStorage.removeItem("accessToken");
 
             navigate("/login", { replace: true });
 
@@ -65,13 +61,12 @@ function ChangePassword() {
             console.error(error);
 
             if (error.response?.status === 400) {
-                alert("La contraseña actual es incorrecta o las nuevas no coinciden");
+                alert("El token es inválido o expiró");
             } else {
                 alert("No se pudo actualizar la contraseña");
             }
 
         }
-
     };
 
     return (
@@ -79,24 +74,13 @@ function ChangePassword() {
             <AuthHeader />
 
             <div className="change-card">
-                <h2 className="fw-bold text-center mb-2">Cambio de contraseña obligatorio</h2>
+                <h2 className="fw-bold text-center mb-2">Recuperar contraseña</h2>
 
                 <p className="text-muted text-center mb-4">
-                    Este paso es requerido para activar tu cuenta
+                    Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta
                 </p>
 
                 <form onSubmit={handleSubmit(onValidSubmit)} noValidate>
-                    <FormInput
-                        name="currentPassword"
-                        label="Contraseña actual"
-                        type="password"
-                        placeholder="Ingresa tu contraseña actual"
-                        value={values.currentPassword}
-                        onChange={handleChange}
-                        required
-                        error={errors.currentPassword}
-                        forceValidate={submitIntentado}
-                    />
 
                     <FormInput
                         name="newPassword"
@@ -112,7 +96,7 @@ function ChangePassword() {
 
                     <FormInput
                         name="confirmPassword"
-                        label="Confirmar Nueva Contraseña"
+                        label="Confirmar nueva contraseña"
                         type="password"
                         placeholder="Confirma tu nueva contraseña"
                         value={values.confirmPassword}
@@ -125,16 +109,17 @@ function ChangePassword() {
                     <button type="submit" className="btn btn-dark w-100">
                         Actualizar
                     </button>
+
                 </form>
 
                 <hr className="my-4" />
 
                 <p className="text-muted text-center small">
-                    Una vez actualizada tu contraseña, podrás acceder a todas las funcionalidades de tu cuenta
+                    Una vez actualizada tu contraseña podrás iniciar sesión nuevamente
                 </p>
             </div>
         </div>
     );
 }
 
-export default ChangePassword;
+export default ResetPassword;

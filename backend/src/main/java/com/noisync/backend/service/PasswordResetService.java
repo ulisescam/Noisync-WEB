@@ -40,7 +40,7 @@ public class PasswordResetService {
     public void requestReset(ForgotPasswordRequest req) {
 
         AppUser user = userRepo
-                .findByCorreoIgnoreCase(req.correo())
+                .findByCorreoIgnoreCase(req.email())
                 .orElseThrow(() ->
                         new RuntimeException("Si el correo existe, recibirás instrucciones.")
                 );

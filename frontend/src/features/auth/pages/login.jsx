@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
 import FormInput from "../components/FormInput";
 import "../components/styles/login.css";
+import { loginRequest, saveSession } from "../../../api/authService.js";
 
 // BACKEND (se usará después)
 // import { loginRequest, saveSession } from "../../../api/authService";
@@ -42,39 +43,22 @@ function Login() {
         useForm(initialValues, validar);
 
     const onValidSubmit = async (vals) => {
+        console.log("LOGIN EJECUTADO");
         setErrorMsg("");
 
         try {
 
-            // =========================
-            // LOGIN SIMULADO (TEMPORAL)
-            // =========================
-
-            const fakeUser = {
-                id: 1,
-                name: "Davor",
-                role: vals.identifier === "leader" ? "LEADER" : "USER"
-            };
-
-            localStorage.setItem("user", JSON.stringify(fakeUser));
-
-            if (fakeUser.role === "LEADER") {
-                navigate("/home-leader");
-            } else {
-                navigate("/home-user");
-            }
-
-            // =========================
-            // LOGIN REAL (BACKEND)
-            // =========================
-            /*
             const data = await loginRequest(vals.identifier, vals.password);
-
+            console.log("ROL:", data.role);
             saveSession(data);
 
-            if (data.role === "LEADER") navigate("/home-leader");
-            else navigate("/home-user");
-            */
+            if (data.mustChangePassword) {
+                navigate("/change-password");
+            } else if (data.role === "LEADER") {
+                navigate("/home-leader");
+            } else if (data.role === "MUSICIAN") {
+                navigate("/home-user");
+            }
 
         } catch (err) {
 

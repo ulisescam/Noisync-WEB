@@ -1,48 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InviteMusicianCard from "../components/inviteMusicianCard";
 import MusiciansTable from "../components/MusiciansTable";
 import EditMusicianCard from "../components/editMusicianCard";
+import { getMusicians, removeMusician } from "../../../api/musicianService";
 
 function MusicianManagement() {
-
     const [editingMusician, setEditingMusician] = useState(null);
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    const isLeader = user?.role === "LEADER";
     const [showInvite, setShowInvite] = useState(false);
 
-    const musicians = [
-        {
-            id: 1,
-            name: "Carlos Mendoza",
-            email: "carlos@example.com",
-            instrument: "Guitarra",
-            role: "Líder",
-            status: "Activo"
-        }
-    ];
-    const handleDelete = (id) => {
+    const role = localStorage.getItem("role");
+    const isLeader = role === "LEADER";
 
-        if (window.confirm("¿Seguro que deseas eliminar este músico?")) {
+    const [musicians, setMusicians] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-            setMusicians(
-                musicians.filter(m => m.id !== id)
-            );
+    const load = async () => {
+        try {
+            setLoading(true);
+            const data = await getMusicians();
 
+            // data debe venir como: [{ userId, bandId, nombreCompleto, correo, username, estatus }, ...]
+            setMusicians(Array.isArray(data) ? data : []);
+        } catch (e) {
+            console.error(e);
+            alert(e?.response?.data?.message || "No se pudo cargar la lista de músicos");
+        } finally {
+            setLoading(false);
         }
     };
-    const handleEdit = (musician) => {
-        setEditingMusician(musician);
+
+    useEffect(() => {
+        load();
+    }, []);
+
+    const handleDelete = async (userId) => {
+        if (!window.confirm("¿Seguro que deseas eliminar este músico?")) return;
+
+        try {
+            await removeMusician(userId, false);
+            setMusicians((prev) => prev.filter((m) => m.userId !== userId));
+        } catch (e) {
+            console.error(e);
+            alert(e?.response?.data?.message || "No se pudo eliminar el músico");
+        }
     };
+
+    const handleEdit = (musician) => setEditingMusician(musician);
 
     const handleSave = (updated) => {
-
-        setMusicians(
-            musicians.map(m =>
-                m.id === updated.id ? updated : m
-            )
+        setMusicians((prev) =>
+            prev.map((m) => (m.userId === updated.userId ? updated : m))
         );
-
         setEditingMusician(null);
     };
 
@@ -56,20 +64,13 @@ function MusicianManagement() {
         );
     }
 
-
-
     if (showInvite) {
-        return (
-            <InviteMusicianCard
-                onBack={() => setShowInvite(false)}
-            />
-        );
+        return <InviteMusicianCard onBack={() => setShowInvite(false)} />;
     }
 
     return (
         <>
             {isLeader && (
-
                 <div className="mb-3">
                     <button className="btn btn-dark" onClick={() => setShowInvite(true)}>
                         + Invitar músico
@@ -77,19 +78,19 @@ function MusicianManagement() {
                 </div>
             )}
 
-
             <div className="card">
-
                 <div className="card-body">
-
-                    <MusiciansTable musicians={musicians}
-                        isLeader={isLeader}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
-
+                    {loading ? (
+                        <div className="text-muted">Cargando músicos...</div>
+                    ) : (
+                        <MusiciansTable
+                            musicians={musicians}
+                            isLeader={isLeader}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
+                    )}
                 </div>
-
             </div>
         </>
     );

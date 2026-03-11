@@ -18,14 +18,15 @@ public class MusicianInstrumentService {
         this.jdbc = jdbc;
     }
 
-    private final RowMapper<MusicianResponse> musicianMapper = (rs, rn) -> new MusicianResponse(
-            rs.getLong("user_id"),
-            rs.getLong("band_id"),
-            rs.getString("nombre_completo"),
-            rs.getString("correo"),
-            rs.getString("username"),
-            rs.getString("estatus")
-    );
+private final RowMapper<MusicianResponse> musicianMapper = (rs, rn) -> new MusicianResponse(
+        rs.getLong("user_id"),
+        rs.getLong("band_id"),
+        rs.getString("nombre_completo"),
+        rs.getString("correo"),
+        rs.getString("username"),
+        rs.getString("estatus"),
+        rs.getString("instrumento")
+);
 
     private final RowMapper<InstrumentResponse> instrumentMapper = (rs, rn) -> new InstrumentResponse(
             rs.getLong("instrument_id"),
@@ -34,16 +35,26 @@ public class MusicianInstrumentService {
             rs.getInt("activo")
     );
 
-    public List<MusicianResponse> listMusicians(Long bandId) {
-        return jdbc.query("""
-            SELECT u.user_id, u.band_id, p.nombre_completo, p.correo, u.username, u.estatus
-            FROM app_user u
-            JOIN person p ON p.person_id = u.person_id
-            WHERE u.band_id = ?
-              AND u.rol = 'MUSICIAN' AND u.activo = 1
-            ORDER BY p.nombre_completo ASC
-        """, musicianMapper, bandId);
-    }
+public List<MusicianResponse> listMusicians(Long bandId) {
+    return jdbc.query("""
+        SELECT 
+            u.user_id,
+            u.band_id,
+            p.nombre_completo,
+            p.correo,
+            u.username,
+            u.estatus,
+            i.nombre AS instrumento
+        FROM app_user u
+        JOIN person p ON p.person_id = u.person_id
+        LEFT JOIN musician_instrument mi ON mi.user_id = u.user_id
+        LEFT JOIN instrument i ON i.instrument_id = mi.instrument_id
+        WHERE u.band_id = ?
+          AND u.rol = 'MUSICIAN'
+          AND u.activo = 1
+        ORDER BY p.nombre_completo ASC
+    """, musicianMapper, bandId);
+}
 
     public List<InstrumentResponse> listMusicianInstruments(Long bandId, Long musicianId) {
         // valida que el musico sea de la banda

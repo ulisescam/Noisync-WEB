@@ -7,6 +7,6 @@ public record ForgotPasswordRequest(
 
         @NotBlank
         @Email
-        String correo
+        String email
 
 ) {}

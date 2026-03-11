@@ -26,7 +26,7 @@ function AuthHeader({ title = "Noisync", showBack = true }) {
                 <h5 className="brand-title">{title}</h5>
 
                 <Link to="/" className="home-link-btn">
-                    Home
+                    Inicio
                 </Link>
             </div>
 

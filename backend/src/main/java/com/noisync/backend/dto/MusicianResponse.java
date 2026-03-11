@@ -6,5 +6,6 @@ public record MusicianResponse(
         String nombreCompleto,
         String correo,
         String username,
-        String estatus
+        String estatus,
+        String instrumento
 ) {}

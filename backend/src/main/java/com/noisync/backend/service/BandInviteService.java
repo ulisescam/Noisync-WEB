@@ -47,18 +47,28 @@ public class BandInviteService {
             InviteMusicianRequest req
     ) {
 
-        // Validar username único
+        // ===== GENERAR USERNAME SI VIENE VACÍO =====
+        String username = req.username();
+
+        if (username == null || username.isBlank()) {
+            username = req.nombreCompleto()
+                    .toLowerCase()
+                    .replaceAll("\\s+", "")
+                    .replaceAll("[^a-z0-9]", "");
+        }
+
+        // ===== VALIDAR USERNAME ÚNICO =====
         Integer usernameCount = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM app_user WHERE LOWER(username) = LOWER(?)",
                 Integer.class,
-                req.username()
+                username
         );
 
         if (usernameCount != null && usernameCount > 0) {
             throw new IllegalArgumentException("Ese username ya está registrado");
         }
 
-        // Validar correo único EN APP_USER
+        // ===== VALIDAR CORREO ÚNICO =====
         Integer correoCount = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM app_user WHERE LOWER(email) = LOWER(?)",
                 Integer.class,
@@ -69,7 +79,7 @@ public class BandInviteService {
             throw new IllegalArgumentException("Ese correo ya está registrado");
         }
 
-        // Password temporal segura
+        // ===== PASSWORD TEMPORAL SEGURA =====
         String tempPassword =
                 "Tmp" + UUID.randomUUID().toString()
                         .replace("-", "")
@@ -77,18 +87,18 @@ public class BandInviteService {
 
         String passwordHash = encoder.encode(tempPassword);
 
-        // Crear persona
+        // ===== CREAR PERSON =====
         jdbc.update("""
-    INSERT INTO person (nombre_completo, telefono, correo, correo_verificado)
-    VALUES (?, ?, ?, 0)
-    """, req.nombreCompleto(), req.telefono(), req.correo());
+            INSERT INTO person (nombre_completo, telefono, correo, correo_verificado)
+            VALUES (?, ?, ?, 0)
+        """, req.nombreCompleto(), req.telefono(), req.correo());
 
         Long personId = jdbc.queryForObject(
                 "SELECT MAX(person_id) FROM person",
                 Long.class
         );
 
-        //  Crear app_user
+        // ===== CREAR APP_USER =====
         jdbc.update("""
         INSERT INTO app_user (
             person_id,
@@ -103,28 +113,33 @@ public class BandInviteService {
             failed_attempts,
             locked_until
         ) VALUES (?, ?, 'MUSICIAN', ?, ?, ?, 'PENDIENTE', 1, 1, 0, NULL)
-    """,
+        """,
                 personId,
                 bandId,
-                req.username(),
+                username,
                 passwordHash,
                 req.correo()
         );
 
-        Long userId = jdbc.queryForObject("SELECT MAX(user_id) FROM app_user", Long.class);
-
+        Long userId = jdbc.queryForObject(
+                "SELECT MAX(user_id) FROM app_user",
+                Long.class
+        );
 
         return new InviteMusicianResponse(
                 true,
                 userId,
                 req.correo(),
-                req.username(),
+                username,
                 tempPassword,
                 null
         );
     }
 
+
+    // ====== ENVIAR CORREO DE INVITACIÓN ======
     public void sendInvitationEmails(Long userId, String correo, String tempPassword) {
+
         AppUser musician = appUserRepository.findById(userId).orElseThrow();
 
         emailVerificationService.sendVerification(musician);
@@ -132,24 +147,26 @@ public class BandInviteService {
         emailService.send(
                 correo,
                 "Noisync - Invitación a la banda",
-                "Has sido invitado.\n\n" +
-                        "Tu contraseña temporal es: " + tempPassword +
-                        "\nPrimero verifica tu correo."
+                "Has sido invitado a una banda en Noisync.\n\n" +
+                        "Usuario: " + musician.getUsername() + "\n" +
+                        "Contraseña temporal: " + tempPassword + "\n\n" +
+                        "Primero verifica tu correo para poder iniciar sesión."
         );
     }
+
+
     // ====== ACCEPT INVITE (musician) ======
     @Transactional
     public String acceptInvite(AcceptInviteRequest req) {
 
         if (!req.newPassword().equals(req.confirmPassword())) {
-            throw new IllegalArgumentException("Las contrasenas no coinciden");
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
         }
 
         validateStrongPassword(req.newPassword());
 
         String tokenHash = sha256Hex(req.token());
 
-        // buscar invitacion pendiente y no expirada
         Long invitationId = jdbc.queryForObject("""
             SELECT invitation_id
             FROM band_invitation
@@ -159,7 +176,7 @@ public class BandInviteService {
         """, Long.class, tokenHash);
 
         if (invitationId == null) {
-            throw new IllegalArgumentException("Token invalido o expirado");
+            throw new IllegalArgumentException("Token inválido o expirado");
         }
 
         Long userId = jdbc.queryForObject("""
@@ -168,7 +185,6 @@ public class BandInviteService {
             WHERE invitation_id = ?
         """, Long.class, invitationId);
 
-        // actualizar password y activar
         String newHash = encoder.encode(req.newPassword());
 
         jdbc.update("""
@@ -177,33 +193,42 @@ public class BandInviteService {
             WHERE user_id = ?
         """, newHash, userId);
 
-        // marcar invitacion aceptada
         jdbc.update("""
             UPDATE band_invitation
             SET estatus = 'ACEPTADA', fecha_aceptacion = SYSTIMESTAMP
             WHERE invitation_id = ?
         """, invitationId);
 
-        return "Invitacion aceptada. Ya puedes iniciar sesion.";
+        return "Invitación aceptada. Ya puedes iniciar sesión.";
     }
+
 
     // ===== helpers =====
     private static void validateStrongPassword(String pass) {
+
         boolean hasUpper = pass.chars().anyMatch(Character::isUpperCase);
         boolean hasDigit = pass.chars().anyMatch(Character::isDigit);
 
         if (pass.length() < 8 || !hasUpper || !hasDigit) {
-            throw new IllegalArgumentException("La contrasena debe tener minimo 8 caracteres, una mayuscula y un numero");
+            throw new IllegalArgumentException(
+                    "La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número"
+            );
         }
     }
 
     private static String sha256Hex(String raw) {
+
         try {
+
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
+
             return HexFormat.of().formatHex(digest);
+
         } catch (Exception e) {
+
             throw new RuntimeException("No se pudo generar hash");
+
         }
     }
 }

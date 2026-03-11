@@ -28,6 +28,8 @@ import ProfileBandUser from "./features/users/pages/profileBandUser";
 import ProfileUser from "./features/users/pages/profileUser";
 import InstrumentsUser from "./features/users/pages/instrumentsUser";
 import MusicianUser from "./features/users/pages/musicianUser";
+import VerifyEmail from "./features/admin/VerifyEmail";
+import ResetPassword from "./features/auth/pages/ResetPassword";
 
 function App() {
   return (
@@ -40,38 +42,47 @@ function App() {
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* change-password solo si viene de primer login */}
+          <Route path="/change-password" element={<ChangePassword />} />
+
           <Route path="/search-public-songs" element={<SongSeachPublic />} />
           <Route path="/vista-cancion-publica/:id" element={<VistaPublicaCancion />} />
           <Route path="/test-backend" element={<TestBackend />} />
 
 
           {/* Rutas protegidas LEADER */}
-          {/*<Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
 
-            {/* Layout exclusivo del líder */}
-          <Route element={<LeaderLayout />}>
-            <Route path="/home-leader" element={<HomeLeader />} />
-            <Route path="/record-song" element={<RecordSong />} />
-            <Route path="/musician-management" element={<MusicianManagement />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/instruments-management" element={<Instruments />} />
-            <Route path="/band-profile" element={<BandProfile />} />
-          </Route>
-
-          <Route element={<UserLayout />}>
-            <Route path="/home-user" element={<HomeUser />} />
-            <Route path="/musician-user" element={<MusicianUser />} />
-            <Route path="/instruments-user" element={<InstrumentsUser />} />
-            <Route path="/profile-user" element={<ProfileUser />} />
-            <Route path="/band-profile-user" element={<ProfileBandUser />} />
+            <Route element={<LeaderLayout />}>
+              <Route path="/home-leader" element={<HomeLeader />} />
+              <Route path="/record-song" element={<RecordSong />} />
+              <Route path="/musician-management" element={<MusicianManagement />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/instruments-management" element={<Instruments />} />
+              <Route path="/band-profile" element={<BandProfile />} />
+            </Route>
 
           </Route>
 
 
-          {/*</Route>*/}
+          {/* Rutas protegidas MUSICIAN */}
+          <Route element={<ProtectedRoute allowedRoles={["MUSICIAN"]} />}>
+
+            <Route element={<UserLayout />}>
+              <Route path="/home-user" element={<HomeUser />} />
+              <Route path="/musician-user" element={<MusicianUser />} />
+              <Route path="/instruments-user" element={<InstrumentsUser />} />
+              <Route path="/profile-user" element={<ProfileUser />} />
+              <Route path="/band-profile-user" element={<ProfileBandUser />} />
+            </Route>
+
+          </Route>
 
         </Route>
 

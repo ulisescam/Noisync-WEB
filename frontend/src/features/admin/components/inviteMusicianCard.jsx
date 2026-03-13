@@ -2,6 +2,8 @@ import { useState } from "react";
 import { api } from "../../../api/api";
 import { getInstruments } from "../../../api/instrumentService";
 
+import { toastSuccess, toastError, toastInfo, confirmDelete, confirmAction } from "../../../api/alerts.js";
+
 
 function InviteMusicianCard({ onBack }) {
     const [availableInstruments, setAvailableInstruments] = useState([]);
@@ -12,7 +14,7 @@ function InviteMusicianCard({ onBack }) {
     const [form, setForm] = useState({
         name: "",
         email: "",
-        instrumentos: [] // Ahora es un array para soportar hasta 5
+        instrumentos: []
     });
 
     const [loading, setLoading] = useState(false);
@@ -38,12 +40,12 @@ function InviteMusicianCard({ onBack }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Instrumentos seleccionados:", form.instrumentos); // <-- agrega esto
+        console.log("Instrumentos seleccionados:", form.instrumentos);
 
 
         // Regla de negocio: Instrumento(s) es obligatorio
         if (form.instrumentos.length === 0) {
-            alert("Debes asignar al menos un instrumento.");
+            toastInfo("Debes asignar al menos un instrumento.");
             return;
         }
 
@@ -58,23 +60,23 @@ function InviteMusicianCard({ onBack }) {
             });
 
             console.log("Invitación enviada:", response.data);
-            alert("Invitación enviada correctamente");
+            toastSuccess("Invitación enviada correctamente");
             onBack();
 
         } catch (error) {
             console.error(error);
             const status = error.response?.status;
             console.error("Status:", error.response?.status);
-            console.error("Error data:", error.response?.data); // <-- agrega esta línea
+            console.error("Error data:", error.response?.data);
             console.error("Error message:", error.response?.data?.message);
 
             // Criterios de aceptación específicos
             if (status === 409) {
-                alert("Este usuario ya pertenece a otra banda y no puede ser agregado.");
+                toastError("Este usuario ya pertenece a otra banda y no puede ser agregado.");
             } else if (status === 403) {
-                alert("No tienes permisos de Líder para realizar esta acción.");
+                toastError("No tienes permisos de Líder para realizar esta acción.");
             } else {
-                alert("No se pudo enviar la invitación. Intenta de nuevo.");
+                toastError("No se pudo enviar la invitación. Intenta de nuevo.");
             }
         } finally {
             setLoading(false);

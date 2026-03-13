@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { createInstrument } from "../../../api/instrumentService";
 
+import { toastSuccess, toastError, toastInfo, confirmDelete, confirmAction } from "../../../api/alerts.js";
+
+
 function AddInstrumentCategoryCard({ onBack }) {
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
@@ -10,16 +13,16 @@ function AddInstrumentCategoryCard({ onBack }) {
         setLoading(true);
         try {
             await createInstrument(name);
-            alert("Categoría creada correctamente");
+            toastSuccess("Categoría creada correctamente");
             onBack();
         } catch (error) {
             const msg = error.response?.data?.message;
             if (msg === "Ese instrumento ya existe") {
-                alert("Ya existe una categoría con ese nombre.");
+                toastError("Ya existe una categoría con ese nombre.");
             } else if (msg === "Límite de 30 categorías alcanzado") {
-                alert("Has alcanzado el límite de 30 categorías.");
+                toastError("Has alcanzado el límite de 30 categorías.");
             } else {
-                alert("No se pudo crear la categoría.");
+                toastError("No se pudo crear la categoría.");
             }
         } finally {
             setLoading(false);

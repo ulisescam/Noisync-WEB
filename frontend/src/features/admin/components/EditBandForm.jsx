@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../../../api/api.js";
+import { toastError } from "../../../api/alerts.js";
 
 
 function EditBandForm({ bandData, onBack }) {
@@ -47,6 +48,7 @@ function EditBandForm({ bandData, onBack }) {
 
         } catch (err) {
             console.error("Error actualizando banda", err);
+            toastError("Error actualizando banda");
         }
     };
 

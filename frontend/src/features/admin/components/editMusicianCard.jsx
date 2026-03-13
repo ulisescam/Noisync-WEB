@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { updateMusicianInstruments } from "../../../api/musicianService.js";
 import { getInstruments } from "../../../api/instrumentService.js";
 
+import { toastSuccess, toastError, toastInfo, confirmDelete, confirmAction } from "../../../api/alerts.js";
+
+
 
 function EditMusicianCard({ musician, onBack, onSave }) {
     const [availableInstruments, setAvailableInstruments] = useState([]);
@@ -32,11 +35,11 @@ function EditMusicianCard({ musician, onBack, onSave }) {
         if (form.instrumentos.length === 0) return alert("Asigna al menos un instrumento.");
         try {
             await updateMusicianInstruments(musician.userId, form.instrumentos);
-            alert("Músico actualizado correctamente");
+            toastSuccess("Músico actualizado correctamente");
             onSave(form);
         } catch (error) {
             console.error(error);
-            alert("No se pudo actualizar el músico.");
+            toastError("No se pudo actualizar el músico.");
         }
     };
 

@@ -3,7 +3,6 @@ import { api } from "./api.js";
 export async function loginRequest(identifier, password) {
   const res = await api.post("/api/auth/login", { identifier, password });
   return res.data; 
-  // { accessToken, refreshToken, userId, bandId, role, mustChangePassword }
 }
 export async function registerRequest(data) {
   const res = await api.post("/api/auth/register-leader", data);

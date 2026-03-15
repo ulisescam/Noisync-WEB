@@ -30,6 +30,12 @@ function SidebarLeader() {
                         <span>Registrar Cancion</span>
                     </NavLink>
                 </li>
+                <li className="nav-item">
+                    <NavLink to="/mis-canciones" className="nav-link d-flex align-items-center gap-3">
+                        <i className="bi bi-collection-play fs-5"></i>
+                        <span>Mis Canciones</span>
+                    </NavLink>
+                </li>
 
                 <li className="nav-item">
                     <NavLink to="/musician-management" className="nav-link d-flex align-items-center gap-3">

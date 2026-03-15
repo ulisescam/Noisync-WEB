@@ -196,4 +196,16 @@ public class SongSectionService {
         for (int i = 0; i < ids.size(); i++) params[i + 1] = ids.get(i);
         return params;
     }
+
+    public List<SectionResponse> listPublic(Long songId) {
+    return jdbc.query("""
+        SELECT s.section_id, s.song_id, s.orden_seccion, s.etiqueta, s.contenido
+        FROM song_section s
+        JOIN song so ON so.song_id = s.song_id
+        WHERE s.song_id = ?
+          AND so.visibilidad = 'PUBLIC'
+          AND so.estatus = 'ACTIVO'
+        ORDER BY s.orden_seccion ASC
+    """, mapper, songId);
+}
 }

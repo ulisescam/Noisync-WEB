@@ -68,6 +68,7 @@ function searchPublicSongs() {
                                 titulo={cancion.titulo}
                                 artista={cancion.artista}
                                 estado={cancion.estado}
+                                nombreBanda={c.nombreBanda}
                             />
 
                         ))}

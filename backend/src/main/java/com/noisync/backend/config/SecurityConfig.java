@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 "/api/auth/reset-password",
                                 "/api/auth/refresh",
                                 "/api/auth/logout",
+                                "/api/songs/public",
+                                "/api/songs/public/**",
 
                                 "/api/dev/**"
                         ).permitAll()

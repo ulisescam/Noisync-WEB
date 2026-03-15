@@ -30,8 +30,10 @@ function MusicianManagement() {
 
     const handleEdit = (musician) => setEditingMusician(musician);
 
+
     const handleDelete = async (userId) => {
-        if (!confirmDelete("¿Seguro que deseas eliminar este músico? Se revocará su acceso inmediato.")) return;
+        const result = await confirmDelete("Se revocará el acceso del músico inmediatamente.");
+        if (!result.isConfirmed) return;
         try {
             await removeMusician(userId);
             toastSuccess("Músico eliminado y acceso revocado");
@@ -43,7 +45,12 @@ function MusicianManagement() {
     };
 
     const handleResetPassword = async (musician) => {
-        if (!confirmAction(`¿Restablecer la contraseña de ${musician.nombreCompleto}? Se le enviará una nueva contraseña a su correo.`)) return;
+        const result = await confirmAction(
+            "¿Restablecer contraseña?",
+            `Se enviará una nueva contraseña al correo de ${musician.nombreCompleto}`,
+            "Sí, restablecer"
+        );
+        if (!result.isConfirmed) return;
         try {
             await resetMusicianPassword(musician.userId);
             toastSuccess("Contraseña restablecida y enviada al músico");

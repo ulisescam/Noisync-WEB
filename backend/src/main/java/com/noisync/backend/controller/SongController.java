@@ -1,11 +1,14 @@
 package com.noisync.backend.controller;
 
 import com.noisync.backend.dto.PageResponse;
+import com.noisync.backend.dto.SectionResponse;
 import com.noisync.backend.dto.SongCreateRequest;
 import com.noisync.backend.dto.SongResponse;
 import com.noisync.backend.dto.SongUpdateRequest;
 import com.noisync.backend.service.SongService;
+import com.noisync.backend.service.SongSectionService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +19,11 @@ import java.util.Map;
 public class SongController {
 
     private final SongService songService;
+    private final SongSectionService songSectionService;
 
-    public SongController(SongService songService) {
+    public SongController(SongService songService, SongSectionService songSectionService) {
         this.songService = songService;
+        this.songSectionService = songSectionService;
     }
 
     private Long bandId(Authentication auth) {
@@ -75,4 +80,27 @@ public class SongController {
         songService.delete(bandId(auth), userId(auth), id);
         return Map.of("ok", true, "message", "Cancion eliminada");
     }
+
+    @GetMapping("/public")
+        public PageResponse<SongResponse> listPublic(
+        @RequestParam(required = false) String q,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+        return songService.listPublic(q, page, size);
+}
+@GetMapping("/public/{id}")
+public SongResponse getPublic(@PathVariable Long id) {
+    return songService.getPublic(id);
+}
+
+@GetMapping("/public/{id}/sections")
+public List<SectionResponse> getSectionsPublic(@PathVariable Long id) {
+    return songSectionService.listPublic(id);
+}
+@PatchMapping("/{id}/visibility")
+public Map<String, Object> toggleVisibility(@PathVariable Long id, Authentication auth) {
+    if (!isLeader(auth)) throw new IllegalArgumentException("Solo un lider puede cambiar la visibilidad");
+    songService.toggleVisibility(bandId(auth), userId(auth), id);
+    return Map.of("ok", true, "message", "Visibilidad actualizada");
+}
 }

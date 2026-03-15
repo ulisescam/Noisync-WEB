@@ -1,14 +1,23 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "../../admin/components/styles/sidebarLeader.css";
+import { clearSession } from "../../../api/authService.js";
+import { confirmAction } from "../../../api/alerts.js";
+
+
 function SidebarUser() {
 
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-
-        navigate("/login");
+    const handleLogout = async () => {
+        const result = await confirmAction(
+            "¿Cerrar sesión?",
+            "Tu sesión actual será terminada",
+            "Sí, salir"
+        );
+        if (result.isConfirmed) {
+            clearSession();
+            navigate("/login");
+        }
     };
 
     return (
@@ -16,7 +25,12 @@ function SidebarUser() {
             style={{ width: "240px" }}>
             <ul className="nav nav-pills flex-column gap-2">
 
-
+                <li className="nav-item">
+                    <NavLink to="/mis-canciones-user" className="nav-link d-flex align-items-center gap-3">
+                        <i className="bi bi-collection-play fs-5"></i>
+                        <span>Mis Canciones</span>
+                    </NavLink>
+                </li>
 
                 <li className="nav-item">
                     <NavLink

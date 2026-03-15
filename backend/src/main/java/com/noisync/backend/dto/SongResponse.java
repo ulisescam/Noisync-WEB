@@ -13,6 +13,7 @@ public record SongResponse(
         String visibilidad,
         String estatus,
         String coverUrl,
+        String nombreBanda,
         Instant fechaCreacion,
         Instant fechaActualizacion
 ) {}

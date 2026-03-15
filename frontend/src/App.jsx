@@ -30,6 +30,8 @@ import InstrumentsUser from "./features/users/pages/instrumentsUser";
 import MusicianUser from "./features/users/pages/musicianUser";
 import VerifyEmail from "./features/admin/VerifyEmail";
 import ResetPassword from "./features/auth/pages/ResetPassword";
+import MisCanciones from "./features/songs/pages/misCanciones";
+import EditSong from "./features/songs/components/editSong";
 
 function App() {
   return (
@@ -54,38 +56,43 @@ function App() {
           <Route path="/search-public-songs" element={<SongSeachPublic />} />
           <Route path="/vista-cancion-publica/:id" element={<VistaPublicaCancion />} />
           <Route path="/test-backend" element={<TestBackend />} />
+        </Route>
 
 
-          {/* Rutas protegidas LEADER */}
-          <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
 
-            <Route element={<LeaderLayout />}>
-              <Route path="/home-leader" element={<HomeLeader />} />
-              <Route path="/record-song" element={<RecordSong />} />
-              <Route path="/musician-management" element={<MusicianManagement />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/instruments-management" element={<Instruments />} />
-              <Route path="/band-profile" element={<BandProfile />} />
-            </Route>
+        {/* Rutas protegidas LEADER */}
+        <Route element={<ProtectedRoute allowedRoles={["LEADER"]} />}>
 
-          </Route>
-
-
-          {/* Rutas protegidas MUSICIAN */}
-          <Route element={<ProtectedRoute allowedRoles={["MUSICIAN"]} />}>
-
-            <Route element={<UserLayout />}>
-              <Route path="/home-user" element={<HomeUser />} />
-              <Route path="/musician-user" element={<MusicianUser />} />
-              <Route path="/instruments-user" element={<InstrumentsUser />} />
-              <Route path="/profile-user" element={<ProfileUser />} />
-              <Route path="/band-profile-user" element={<ProfileBandUser />} />
-            </Route>
-
+          <Route element={<LeaderLayout />}>
+            <Route path="/home-leader" element={<HomeLeader />} />
+            <Route path="/record-song" element={<RecordSong />} />
+            <Route path="/musician-management" element={<MusicianManagement />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/instruments-management" element={<Instruments />} />
+            <Route path="/band-profile" element={<BandProfile />} />
+            <Route path="/vista-cancion-leader/:id" element={<VistaPublicaCancion />} />
+            <Route path="/mis-canciones" element={<MisCanciones />} />
+            <Route path="/edit-song/:id" element={<EditSong />} />
           </Route>
 
         </Route>
 
+
+        {/* Rutas protegidas MUSICIAN */}
+        <Route element={<ProtectedRoute allowedRoles={["MUSICIAN"]} />}>
+
+          <Route element={<UserLayout />}>
+            <Route path="/home-user" element={<HomeUser />} />
+            <Route path="/musician-user" element={<MusicianUser />} />
+            <Route path="/instruments-user" element={<InstrumentsUser />} />
+            <Route path="/profile-user" element={<ProfileUser />} />
+            <Route path="/band-profile-user" element={<ProfileBandUser />} />
+            <Route path="/vista-cancion-user/:id" element={<VistaPublicaCancion />} />
+            <Route path="/mis-canciones-user" element={<MisCanciones />} />
+
+          </Route>
+
+        </Route>
       </Routes>
     </BrowserRouter>
   );

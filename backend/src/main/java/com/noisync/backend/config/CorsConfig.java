@@ -19,8 +19,7 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of("http://localhost:5173"));
 
         // Métodos
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         // Headers permitidos (incluye Authorization para JWT)
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 

@@ -5,17 +5,8 @@ export async function getMusicians() {
   return res.data;
 }
 
-export async function removeMusician(musicianId, removeInstruments = false) {
-  const res = await api.delete(`/api/musicians/${musicianId}`, {
-    params: { removeInstruments },
-  });
-  return res.data;
-}
-
-export async function activateMusician(musicianId, forcePasswordChange = false) {
-  const res = await api.put(`/api/musicians/${musicianId}/activate`, null, {
-    params: { forcePasswordChange },
-  });
+export async function removeMusician(musicianId) {
+  const res = await api.delete(`/api/musicians/${musicianId}`);
   return res.data;
 }
 
@@ -23,7 +14,8 @@ export async function resetMusicianPassword(musicianId) {
   const res = await api.post(`/api/musicians/${musicianId}/reset-password`);
   return res.data;
 }
+
 export async function updateMusicianInstruments(musicianId, instrumentos) {
-    const res = await api.put(`/api/musicians/${musicianId}/instruments`, instrumentos);
-    return res.data;
+  const res = await api.put(`/api/musicians/${musicianId}/instruments`, instrumentos);
+  return res.data;
 }

@@ -1,17 +1,23 @@
 function resolverAcorde(grado, tonica, escala, transposicion = 0) {
     const NOTAS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    // Mapeo de bemoles a sus equivalentes con sostenido
+    const BEMOLES = { "Db": "C#", "Eb": "D#", "Fb": "E", "Gb": "F#", "Ab": "G#", "Bb": "A#", "Cb": "B" };
+
     const GRADOS_MAYOR = [0, 2, 4, 5, 7, 9, 11];
     const GRADOS_MENOR = [0, 2, 3, 5, 7, 8, 10];
     const TIPOS_MAYOR = ["", "m", "m", "", "", "m", "dim"];
     const TIPOS_MENOR = ["m", "dim", "", "m", "m", "", ""];
 
-    const tonicaIdx = NOTAS.indexOf(tonica);
+    // Normalizar la tónica (convertir bemol a sostenido equivalente)
+    const tonicaNorm = BEMOLES[tonica] || tonica;
+    const tonicaIdx = NOTAS.indexOf(tonicaNorm);
     if (tonicaIdx === -1 || grado < 1 || grado > 7) return `$${grado}`;
 
     const grados = escala === "Menor" ? GRADOS_MENOR : GRADOS_MAYOR;
     const tipos = escala === "Menor" ? TIPOS_MENOR : TIPOS_MAYOR;
 
-    const idx = (tonicaIdx + grados[grado - 1] + transposicion + 120) % 12;
+    // El módulo con +120 asegura que siempre sea positivo antes de aplicar %12
+    const idx = ((tonicaIdx + grados[grado - 1] + transposicion) % 12 + 12) % 12;
     return NOTAS[idx] + tipos[grado - 1];
 }
 

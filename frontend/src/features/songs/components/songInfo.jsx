@@ -1,13 +1,19 @@
 import "../styles/songInfo.css";
 import SongAvatar from "./songAvatar";
 
-function SongInfo({ titulo, artista, tono, bpm, estado, cover, setTransposicion }) {
+function SongInfo({ titulo, artista, tono, bpm, estado, cover, setTransposicion, transposicion = 0 }) {
 
-    const subir = () => setTransposicion(t => t + 1);
-    const bajar = () => setTransposicion(t => t - 1);
-    const subirMedio = () => setTransposicion(t => t + 1);  // +½ tono = +1 semitono
-    const bajarMedio = () => setTransposicion(t => t - 1);  // -½ tono = -1 semitono
-    const restablecer = () => setTransposicion(0);
+    // 1 tono = 2 semitonos en la escala cromática
+    const subirTono     = () => setTransposicion(t => t + 2);
+    const bajarTono     = () => setTransposicion(t => t - 2);
+    const subirSemitono = () => setTransposicion(t => t + 1);
+    const bajarSemitono = () => setTransposicion(t => t - 1);
+    const restablecer   = () => setTransposicion(0);
+
+    const mostrarTransposicion = () => {
+        if (transposicion === 0) return "Original";
+        return transposicion > 0 ? `+${transposicion} st` : `${transposicion} st`;
+    };
 
     return (
         <div className="song-info-card">
@@ -15,14 +21,10 @@ function SongInfo({ titulo, artista, tono, bpm, estado, cover, setTransposicion 
             <div className="d-flex align-items-center">
 
                 <div className="cover-container">
-                    <SongAvatar
-                        nombre={titulo}
-                        imagen={cover}
-                    />
+                    <SongAvatar nombre={titulo} imagen={cover} />
                 </div>
 
                 <div className="flex-grow-1 ms-4">
-
                     <div className="d-flex justify-content-between align-items-start">
 
                         <div>
@@ -37,27 +39,40 @@ function SongInfo({ titulo, artista, tono, bpm, estado, cover, setTransposicion 
                             </div>
                         </div>
 
-                        <span className="badge">{estado}</span>
-
+                        {/* Badge de estado: usa clase propia para no pisar Bootstrap */}
+                        <span className="estado-badge">{estado}</span>
 
                     </div>
-
                 </div>
             </div>
 
             <hr />
 
             <div>
-                <p className="fw-semibold mb-2">Controles de transposición</p>
+                <div className="d-flex align-items-center gap-3 mb-2">
+                    <p className="fw-semibold mb-0">Controles de transposición</p>
+                    <span className={`badge ${transposicion === 0 ? "bg-secondary" : "bg-success"}`}>
+                        {mostrarTransposicion()}
+                    </span>
+                </div>
 
-                <div className="d-flex gap-2 align-items-center">
-
-                    <button className="btn btn-outline-secondary" onClick={subir}>+1</button>
-                    <button className="btn btn-outline-secondary" onClick={bajar}>-1</button>
-                    <button className="btn btn-outline-secondary" onClick={subirMedio}>+½</button>
-                    <button className="btn btn-outline-secondary" onClick={bajarMedio}>-½</button>
-                    <button className="btn btn-outline-secondary" onClick={restablecer}>Restablecer</button>
-
+                <div className="d-flex gap-2 align-items-center flex-wrap">
+                    <button className="btn btn-outline-secondary" onClick={subirTono}>
+                        +1 tono
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={bajarTono}>
+                        -1 tono
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={subirSemitono}>
+                        +½ tono
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={bajarSemitono}>
+                        -½ tono
+                    </button>
+                    <button className="btn btn-outline-danger" onClick={restablecer}>
+                        <i className="bi bi-arrow-counterclockwise me-1"></i>
+                        Restablecer
+                    </button>
                 </div>
             </div>
 

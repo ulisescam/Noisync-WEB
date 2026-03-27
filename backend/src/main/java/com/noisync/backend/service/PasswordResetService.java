@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,11 +24,15 @@ public class PasswordResetService {
     private final PasswordEncoder encoder;
     private final EmailService emailService;
 
+    @Value("${app.frontend.reset-url}")
+    private String resetUrl;
+
     public PasswordResetService(
             JdbcTemplate jdbc,
             AppUserRepository userRepo,
             PasswordEncoder encoder,
             EmailService emailService
+            
     ) {
         this.jdbc = jdbc;
         this.userRepo = userRepo;
@@ -57,8 +62,8 @@ public class PasswordResetService {
             )
             VALUES (?, ?, SYSTIMESTAMP + NUMTODSINTERVAL(1,'HOUR'), 'PENDIENTE')
         """, user.getUserId(), tokenHash);
-
-        String link = "http://localhost:5173/reset-password?token=" + token;
+ 
+        String link = resetUrl + token;
 
         emailService.send(
                 user.getCorreo(),

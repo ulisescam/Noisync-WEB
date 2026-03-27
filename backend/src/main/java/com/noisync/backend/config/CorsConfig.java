@@ -18,8 +18,8 @@ public class CorsConfig {
         // Origen de tu front Vite
 config.setAllowedOrigins(List.of(
     "http://localhost:5173",
-    "https://noisync-app.netlify.app" ,
-    "https://richard-subscriber-brain-quick.trycloudflare.com"
+    "https://noisync-app.netlify.app",
+    "https://unprophetical-ungravely-jolene.ngrok-free.dev"
 ));
         // Métodos
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

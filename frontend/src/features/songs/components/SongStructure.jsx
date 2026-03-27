@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ChromaticScale from "./ChromaticScale";
 import SongBlock from "./SongBlock";
-import "../styles/songStructure.css";
+import "../styles/SongStructure.css";
 
 function SongStructure({ onSave, onCancel, buttonText = "Guardar canción", initialBlocks = [] }) {
     const [blocks, setBlocks] = useState(initialBlocks);

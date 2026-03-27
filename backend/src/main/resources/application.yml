@@ -9,7 +9,7 @@ app:
   security:
     lock-minutes: 10
   frontend:
-    verify-url: "http://localhost:5173/verify-email?token="
+    verify-url: "https://TU-APP.netlify.app/verify-email?token="
 
 spring:
   datasource:

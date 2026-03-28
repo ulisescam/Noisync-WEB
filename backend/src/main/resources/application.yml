@@ -9,8 +9,9 @@ app:
   security:
     lock-minutes: 10
 frontend:
-    verify-url: ${FRONTEND_VERIFY_URL:"https://noisync-app.netlify.app/verify-email?token="}
-    reset-url: "https://noisync-app.netlify.app/reset-password?token="
+  frontend:
+    verify-url: ${FRONTEND_VERIFY_URL:https://noisync-app.netlify.app/verify-email?token=}
+    reset-url: ${FRONTEND_RESET_URL:https://noisync-app.netlify.app/reset-password?token=}
 spring:
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
